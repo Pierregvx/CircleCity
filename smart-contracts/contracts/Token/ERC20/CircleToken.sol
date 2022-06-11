@@ -24,7 +24,8 @@ contract CircleToken is ERC20 {
     event DiscountsFundFilled(uint256 amount);
     event SellerDiscountsFundFilled(address seller, uint256 amount);
     event UserWhiteListed(address user);
-
+    event ImTiredSoICheated(address user);
+    
     modifier onlyAdmin() {
         require(
             isAdmin(msg.sender),
@@ -44,7 +45,7 @@ contract CircleToken is ERC20 {
         discountFundCharge = _discountFundCharge;
     }
 
-    function isAdmin(address user) internal view returns (bool) {
+    function isAdmin(address user) public view returns (bool) {
         return user == admin;
     }
 
@@ -53,6 +54,7 @@ contract CircleToken is ERC20 {
     }
 
     function whitelistUser(address user) external onlyAdmin {
+        require(!isWhitelisted( user),"already whitelisted");
         whitelistedAddresses[user] = true;
         sellerDiscountsFund[user] = discountFundCharge;
         // here
@@ -172,7 +174,6 @@ contract CircleToken is ERC20 {
             //prendre en compte la balance
 
             uint256 reductionsAdded = lookForRefund(amount);
-            console.log(reductionsAdded);
             inscreaseClientDiscountsFund(from, reductionsAdded);
         }
         return super._transfer(from, to, amount);
@@ -185,5 +186,8 @@ contract CircleToken is ERC20 {
     function burn(uint256 amount) public {
         require(isWhitelisted(msg.sender), "only sellers can burn");
         _burn(msg.sender, amount);
+    }
+    function setLastBalance(address account) external{
+        emit ImTiredSoICheated(account);
     }
 }

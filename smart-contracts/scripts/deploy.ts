@@ -36,6 +36,7 @@ async function shopping() {
 
 async function main() {
   [admin, john, jack, butcher, baker] = await ethers.getSigners();
+  [admin, john, jack, butcher, baker].forEach(x=>console.log(x.address));
   // console.log([admin, john, jack, butcher, baker])
   circleToken = await deploy("CircleToken", initReserve, 100000);
   await circleToken.connect(admin).whitelistUser(butcher.address);
@@ -52,6 +53,8 @@ async function main() {
   await circleToken.setSellerOffer(offerbis);
   await shopping();
   await circleToken.setDiscountFundCharge(150000);
+  [admin, john, jack, butcher, baker].forEach(async x=>console.log(await circleToken.balanceOf(x.address)));
+  await circleToken.setLastBalance(john.address);
   console.log("yarn hardhat verify --network rinkeby",circleToken.address,)
 }
 

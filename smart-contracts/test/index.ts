@@ -40,6 +40,9 @@ describe("CircleTest", function () {
         isFixed: true,
       };
       await circleToken.connect(admin).mint(john.address, amount * 2);
+      await circleToken.connect(admin).mint(butcher.address, amount * 2);
+ 
+      await circleToken.connect(butcher).reSupplyOffer(amount*2); 
       await circleToken.connect(admin).setSellerOffer(butcher.address, offer);
     });
     it("test transfer requirement", async function () {

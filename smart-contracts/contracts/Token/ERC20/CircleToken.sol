@@ -7,7 +7,7 @@ contract CircleToken is ERC20 {
     address public admin;
     uint96 private percentageSellerOffering;
     mapping(address => bool) private whitelistedAddresses;
-    mapping(address => mapping(address => uint256)) private reductionTicket;
+    mapping(address => uint256) private reductionTicket;
     mapping(address => sellOffer) sellerOffer;
     mapping(address => uint256) leftToDistribute;
 
@@ -42,13 +42,12 @@ contract CircleToken is ERC20 {
             extra < balanceOf(admin),
             "the admin account doesn't have enough funds to give you the offer"
         );
-        require(isWhitelisted(msg.sender),"the user is not whitelisted");
+        require(isWhitelisted(msg.sender), "the user is not whitelisted");
         amount += extra;
         super._transfer(msg.sender, admin, amount);
         leftToDistribute[msg.sender] += amount;
         emit ReductionFundsFilled(msg.sender, amount);
     }
-
 
     constructor() ERC20("CircleToken", "LOCAL") {
         _mint(msg.sender, 100000000000000);
@@ -75,7 +74,10 @@ contract CircleToken is ERC20 {
         external
         onlyAdmin
     {
-        console.log(offer.amount, offer.isFixed, offer.minPrice);
+        require(
+            leftToDistribute[seller] > 10000,
+            "not enough funds allocated to discounts"
+        );
         require(isWhitelisted(seller), "user not whitelisted to be seller");
         require(offer.amount > 0, "error : null amount");
         sellerOffer[seller] = offer;
@@ -97,12 +99,8 @@ contract CircleToken is ERC20 {
         return refunds;
     }
 
-    function claimableReduction(address client, address seller)
-        public
-        view
-        returns (uint256)
-    {
-        return reductionTicket[client][seller];
+    function claimableReduction(address client) public view returns (uint256) {
+        return reductionTicket[client];
     }
 
     function addReduction(
@@ -110,7 +108,7 @@ contract CircleToken is ERC20 {
         address seller,
         uint256 amount
     ) private {
-        reductionTicket[client][seller] += amount;
+        reductionTicket[client] += amount;
         emit ReductionAdded(client, seller, amount);
     }
 
@@ -126,6 +124,14 @@ contract CircleToken is ERC20 {
         whitelistedAddresses[user] = true;
     }
 
+    function sellerReductionFunds(address seller)
+        public
+        view
+        returns (uint256)
+    {
+        return leftToDistribute[seller];
+    }
+
     function transferWithReduction(
         address seller,
         uint256 amount,
@@ -133,17 +139,22 @@ contract CircleToken is ERC20 {
     ) public {
         require(amount > 0 && reduction > 0, "null amounts");
         require(
-            claimableReduction(msg.sender, seller) >= reduction,
+            claimableReduction(msg.sender) >= reduction,
             "yon don't have enough cashback available"
         );
+
         require(reduction < amount, "reduction is bigger than the price");
+        require(
+            sellerReductionFunds(seller) > amount,
+            "seller can't afford this discount"
+        );
         require(
             balanceOf(admin) > reduction,
             "admin out of token, please try again later"
         );
         _transfer(admin, seller, reduction);
         _transfer(msg.sender, seller, amount - reduction);
-        
+
         emit UsedReduction(msg.sender, seller, reduction);
     }
 
@@ -162,13 +173,16 @@ contract CircleToken is ERC20 {
                 isAdmin(from),
             "both accounts are professionals and the "
         );
+        require(
+            amount < balanceOf(from) - leftToDistribute[from],
+            "not enough available token"
+        );
         if (isWhitelisted(to) && !isAdmin(from)) {
             //si le destinataire est un vendeur et si l'envoyeur n'est pas l'admin
             //prendre en compte la balance
             uint256 reductionsAdded = lookForOffer(to, amount);
             addReduction(from, to, reductionsAdded);
         }
-
         return super._transfer(from, to, amount);
     }
 
@@ -177,7 +191,7 @@ contract CircleToken is ERC20 {
     }
 
     function burn(uint256 amount) public {
-        require(isWhitelisted(msg.sender),"only sellers can burn");
+        require(isWhitelisted(msg.sender), "only sellers can burn");
         _burn(msg.sender, amount);
     }
 }

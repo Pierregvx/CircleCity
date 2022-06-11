@@ -6,6 +6,9 @@ import "hardhat/console.sol";
 contract CircleToken is ERC20 {
     address public admin;
     uint96 private percentageSellerOffering;
+    uint256 public reserveFunds;
+    uint256 public helpSellers;
+
     mapping(address => bool) private whitelistedAddresses;
     mapping(address => uint256) private reductionTicket;
     mapping(address => sellOffer) sellerOffer;
@@ -27,7 +30,11 @@ contract CircleToken is ERC20 {
     event UsedReduction(address client, address seller, uint256 reduction);
     event ReductionFundsFilled(address seller, uint256 amount);
     event ReductionFundsUsed(address seller, uint256 amount);
-
+    event UpdatedSellerAdvantage(uint96 percentage);
+    event UserWhiteListed(address user);
+    event OutOfDiscount(address seller, uint256 amountLeft);
+    event outOfHelpSellers(uint96 percentage,uint256 balance);
+    event AddedToHelpingSellersFund(address donator,uint256 amount);
     modifier onlyAdmin() {
         require(
             isAdmin(msg.sender),
@@ -36,22 +43,32 @@ contract CircleToken is ERC20 {
         _;
     }
 
+    constructor(uint256 reserve) ERC20("CircleToken", "LOCAL") {
+        _mint(msg.sender, reserve);
+        reserveFunds = reserve;
+        admin = msg.sender;
+        whitelistedAddresses[admin]=true;
+    }
+    function sellerDonation(uint256 amount)external {
+        _transfer(msg.sender,admin,amount);
+        helpSellers +=amount;
+        emit AddedToHelpingSellersFund(msg.sender,amount);
+
+    }
     function reSupplyOffer(uint256 amount) external {
         uint256 extra = (amount * percentageSellerOffering) / 10000;
-        require(
-            extra < balanceOf(admin),
-            "the admin account doesn't have enough funds to give you the offer"
-        );
+    
+        if (extra > helpSellers) {
+            emit outOfHelpSellers(percentageSellerOffering, helpSellers);
+            revert(
+                "the admin account doesn't have enough funds to give you the offer"
+            );
+        }
         require(isWhitelisted(msg.sender), "the user is not whitelisted");
-        amount += extra;
         super._transfer(msg.sender, admin, amount);
-        leftToDistribute[msg.sender] += amount;
+        leftToDistribute[msg.sender] += amount+extra;
+        helpSellers-=extra;
         emit ReductionFundsFilled(msg.sender, amount);
-    }
-
-    constructor() ERC20("CircleToken", "LOCAL") {
-        _mint(msg.sender, 100000000000000);
-        admin = msg.sender;
     }
 
     function getSellerPercentageOffer() public view returns (uint96) {
@@ -59,7 +76,9 @@ contract CircleToken is ERC20 {
     }
 
     function setSellerPercentageOffer(uint96 percentage) external onlyAdmin {
+        // require(percentage<5000,"faut pas forcer non plus");
         percentageSellerOffering = percentage;
+        emit UpdatedSellerAdvantage(percentage);
     }
 
     function getSellerOffer(address seller)
@@ -74,12 +93,12 @@ contract CircleToken is ERC20 {
         external
         onlyAdmin
     {
-        require(
-            leftToDistribute[seller] > 10000,
-            "not enough funds allocated to discounts"
-        );
         require(isWhitelisted(seller), "user not whitelisted to be seller");
         require(offer.amount > 0, "error : null amount");
+        if (leftToDistribute[seller] < 10000) {
+            emit OutOfDiscount(seller, leftToDistribute[seller]);
+            revert("not enough funds allocated to discounts");
+        }
         sellerOffer[seller] = offer;
         emit OfferSet(seller, offer.minPrice, offer.amount, offer.isFixed);
     }
@@ -122,6 +141,7 @@ contract CircleToken is ERC20 {
 
     function whitelistUser(address user) external onlyAdmin {
         whitelistedAddresses[user] = true;
+        emit UserWhiteListed(user);
     }
 
     function sellerReductionFunds(address seller)
@@ -149,10 +169,12 @@ contract CircleToken is ERC20 {
             "seller can't afford this discount"
         );
         require(
-            balanceOf(admin) > reduction,
+            balanceOf(admin) - reserveFunds -helpSellers> reduction,
             "admin out of token, please try again later"
         );
+
         _transfer(admin, seller, reduction);
+        leftToDistribute[seller] -= reduction;
         _transfer(msg.sender, seller, amount - reduction);
 
         emit UsedReduction(msg.sender, seller, reduction);

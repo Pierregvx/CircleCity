@@ -1,43 +1,69 @@
-import * as dotenv from "dotenv";
-
+/* eslint-disable prettier/prettier */
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-
+import "hardhat-contract-sizer";
+import * as dotenv from "dotenv";
+require("@nomiclabs/hardhat-ganache");
 dotenv.config();
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
-  networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    solidity: {
+        version: "0.8.9",
+        settings: {
+            // evmVersion: "constantinople",
+            evmVersion: "istanbul",
+            optimizer: {
+                enabled: true,
+                runs: 200,
+            },
+        },
     },
-  },
+    networks: {
+        mumbai: {
+            url: "https://polygon-mumbai.g.alchemy.com/v2/EU6IHhJ9DWNVfHysQNgH1M-2QJUSSg4S",
+            accounts: ["c2e3ce0229bb1624a92881c8dd0a7ef154449a01c72f54e0f4d16b0c41508a79"],
+        },
+        rinkeby: {
+            url: "https://eth-rinkeby.alchemyapi.io/v2/t4ekhcTowyYkJYt8sMsDcc6VsTtK8fYT",
+            accounts: [
+                "c2e3ce0229bb1624a92881c8dd0a7ef154449a01c72f54e0f4d16b0c41508a79",
+                "3a48da37c9850dd1f94325df485a84aef8081c1cc9d2a78e8ee4e6e22218c0e3",
+                "b7342c396b70f82fe04e4a891ded0b69187ebd0f7353e626bf0a8616614df2da",
+                "2d3230c5495517bc4e0d87d80121bc6362496a6677116b4ed29ddf50f6bcef38",
+                "1a57200a0f4d469b9ac60b2857a595c5c7b00787e5fb1238a106113fe10b941d",
+                "a26f9c5e90e29af2a452434aaf820cb0a92d420eb2f2049a6c930742c2a8ff80"
+            ],
+            gas: 2100000,
+            gasPrice: 8000000000,
+        },
+        
+    },
+
+    paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
+        artifacts: "./artifacts",
+    },
+
+    /*
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  },
+  */
+
+    etherscan: {
+        apiKey: "E875E9XHFVBD2YCBSBTZPE72Q1156U8PEQ",
+    },
 };
 
 export default config;

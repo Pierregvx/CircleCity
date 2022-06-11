@@ -1,19 +1,72 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
+/* eslint-disable prettier/prettier */
+/* eslint-disable import/first */
+const chai = require("chai");
+const expect = chai.expect;
+chai.use(require("chai-as-promised"));
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+const { ethers, upgrades } = require("hardhat");
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { Console } from "console";
+import { Address } from "ethereumjs-util";
+import { BigNumber, Contract } from "ethers";
+// @ts-ignore
+upgrades.silenceWarnings();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+async function deploy(name: string, ...params: any) {
+  const Contract = await ethers.getContractFactory(name);
+  return await Contract.deploy(...params).then((c: Contract) => c.deployed());
+}
+describe("CircleTest", function () {
+  let admin: SignerWithAddress;
+  let john: SignerWithAddress;
+  let jack: SignerWithAddress;
+  let butcher: SignerWithAddress;
+  let baker: SignerWithAddress;
+  let circleToken: Contract;
+  beforeEach(async () => {
+    [admin, john, jack, butcher, baker] = await ethers.getSigners();
+    circleToken = await deploy("CircleToken");
+    await circleToken.connect(admin).whitelistUser(butcher.address);
+    await circleToken.connect(admin).whitelistUser(baker.address);
+  });
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+  describe("#test token", async function () {
+    let amount = 10000;
+    let offer: any;
+    beforeEach(async () => {
+      offer = {
+        minPrice: 1000,
+        amount: 100,
+        isFixed: true,
+      };
+      await circleToken.connect(admin).mint(john.address, amount * 2);
+      await circleToken.connect(admin).setSellerOffer(butcher.address, offer);
+    });
+    it("test transfer requirement", async function () {
+      await expect(circleToken.connect(john).transfer(jack.address, amount)).to
+        .be.reverted;
+      await circleToken.connect(john).transfer(butcher.address, amount);
+    });
+    it("test reduction", async function () {
+      await expect(
+        circleToken
+          .connect(john)
+          .transferWithReduction(
+            butcher.address,
+            ethers.utils.parseUnits("1", "ether"),
+            ethers.utils.parseUnits("1", "wei")
+          )
+      ).to.be.reverted;
+      console.log("here");
+      await circleToken.connect(john).transfer(butcher.address, amount);
+      await circleToken
+        .connect(john)
+        .transferWithReduction(
+          butcher.address,
+          amount,
+          1
+        );
+        await expect(await circleToken.balanceOf(john.address)).to.be.equal(1)
+    });
   });
 });

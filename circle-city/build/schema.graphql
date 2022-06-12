@@ -1,0 +1,26 @@
+type User @entity {
+    id:ID!
+    Funds:BigInt!
+
+    
+}
+type Client @User @entity  {
+  id:ID!
+  user:User!
+  claimableRefund:BigInt!
+  
+}
+type Seller @entity{
+  id:ID!
+  user:User!
+  lastrefill:BigInt!
+  sellerDiscountsFund:BigInt!
+
+}
+type historyTransfer @entity {
+  id:ID!
+  from:User!
+  to:User!
+  amount:BigInt!
+  time:BigInt!
+}

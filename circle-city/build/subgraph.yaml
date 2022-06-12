@@ -1,0 +1,46 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Circle
+    network: rinkeby
+    source:
+      address: "0x5a6A370ACe53e633c81034562aF79540a2cF5BCE"
+      abi: Circle
+      startBlock: 10835806
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - DiscountsFundFilled
+        - ImTiredSoICheated
+        - OfferSet
+        - RefundFundIncreased
+        - SellerDiscountsFundFilled
+        - Transfer
+        - UsedRefund
+        - UserWhiteListed
+      abis:
+        - name: Circle
+          file: Circle/abis/Circle.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: DiscountsFundFilled(uint256)
+          handler: handleDiscountsFundFilled
+        - event: OfferSet(uint256,uint256,bool)
+          handler: handleOfferSet
+        - event: RefundFundIncreased(address,uint256)
+          handler: handleRefundFundIncreased
+        - event: SellerDiscountsFundFilled(address,uint256)
+          handler: handleSellerDiscountsFundFilled
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: UsedRefund(address,address,uint256)
+          handler: handleUsedRefund
+        - event: UserWhiteListed(address)
+          handler: handleUserWhiteListed
+      file: Circle/Circle.wasm

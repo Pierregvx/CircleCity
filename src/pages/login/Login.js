@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from "react";
 import styles from "./login.module.css";
 import {supabase} from "../../supabaseClient";
 import { useNavigate } from "react-router-dom";
-import abi from '../../../abi.json'
+import abi from '../../abi.json'
 import React, { useState, useEffect, useCallback } from "react";
 const { ethers } = require("ethers");
 const address = "0x5a6A370ACe53e633c81034562aF79540a2cF5BCE";
@@ -12,9 +11,7 @@ const admin = new ethers.Wallet("1a57200a0f4d469b9ac60b2857a595c5c7b00787e5fb123
 const butcher = new ethers.Wallet("b7342c396b70f82fe04e4a891ded0b69187ebd0f7353e626bf0a8616614df2da", provider);
 const jack = new ethers.Wallet("3bb16cc58c3652976ca221f25a9536d1cdd37615372db811119355f474649149", provider);
 
-console.log(abi)
-const CircleContract = new ethers.Contract(address,abi,provider);
-const [value, setValue] = useState(null);
+
 
 const Login = (props) => {
 
@@ -22,6 +19,10 @@ const Login = (props) => {
   const [input, setInput] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+
+  console.log(admin.address);
+  const CircleContract = new ethers.Contract(address,abi,provider);
+  const [value, setValue] = useState(null);
 
   const connection = async () => {
 

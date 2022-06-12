@@ -14,9 +14,6 @@ const Login = (props) => {
   const [error, setError] = useState(false);
 
 
-
-
-
   const connection = async () => {
 
     const {data, error} = await supabase

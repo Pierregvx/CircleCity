@@ -11,11 +11,7 @@ import axios from "axios";
 const Dashboard = (props) => {
 
   const [actualBalance, setActualBalance] = useState("");
-  const [name, setName] = useState("")
-
-  useEffect(() => {
-    setActualBalance("12.300")
-  }, [])
+  const [name, setName] = useState("Canberra")
 
   useEffect(() => {
     main();
@@ -26,14 +22,14 @@ const Dashboard = (props) => {
       {
         query: `
         {
-          users(first: 5) {
+          user(id: "` + props.address.toString() + `" ) {
            id 
            Funds
           }
         }
         `
       })
-    console.log(resultAxios.data.data.users);
+    setActualBalance(resultAxios.data.data.user.Funds);
   }
 
 
@@ -51,7 +47,7 @@ const Dashboard = (props) => {
       </header>
 
       <div className={styles.titleWrapper}>
-        <h1>Hi, {props.address}</h1>
+        <h1>Hi, {name}</h1>
         <p>Welcome, Back!</p>
       </div>
 

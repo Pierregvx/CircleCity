@@ -7,29 +7,44 @@ import StatLine from "../../components/StatLine/StatLine";
 import HistoricCard from "../../components/HistoricCard/HistoricCard";
 import Logo from "../../img/CircleCityImageTrans.png";
 import axios from "axios";
+import abi from "../../abi.json";
+
+const { ethers } = require("ethers");
+const address = "0x5a6A370ACe53e633c81034562aF79540a2cF5BCE";
+const provider = new ethers.providers.JsonRpcProvider("https://eth-rinkeby.alchemyapi.io/v2/CKWiEfWIkOb2lvcXSBCllnUW-mj4dy7c")
 
 const Dashboard = (props) => {
 
+  const CircleContract = new ethers.Contract(address,abi,provider);
   const [actualBalance, setActualBalance] = useState("");
-  const [name, setName] = useState("Canberra")
+  const [name, setName] = useState("Canberra");
+  const [user, setUser] = useState();
+
 
   useEffect(() => {
-    main();
+
+    const user = new ethers.Wallet(props.privateKey, provider).address;
+
+
+    main(user);
   }, [])
 
-  const main = async () => {
+  const main = async (address) => {
+
     const resultAxios = await axios.post('https://api.thegraph.com/subgraphs/id/QmWopUZTzWScTrNSvmMNUW93ZheeErwxjXDKKq8FzicYWe',
       {
         query: `
         {
-          user(id: "` + props.address.toString() + `" ) {
+          user(id: "` + address + `" ) {
            id 
            Funds
           }
         }
         `
       })
-    setActualBalance(resultAxios.data.data.user.Funds);
+
+    console.log(resultAxios.data.data);
+    setActualBalance(resultAxios.data.data);
   }
 
 

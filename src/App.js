@@ -6,15 +6,15 @@ import {useState} from "react";
 
 function App() {
 
-  const [privateKey, setPrivateKey] = useState("");
+  const [address, setAddress] = useState("");
 
   return (
     <Routes>
       <Route path="/" element={
-        <Login setPrivateKey={setPrivateKey}/>
+        <Login getAddress={setAddress}/>
       }/>
       <Route path="dashboard" element={
-        <Dashboard privateKey={privateKey}/>
+        <Dashboard address={address}/>
       }/>
     </Routes>
   );

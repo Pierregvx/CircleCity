@@ -1,0 +1,23 @@
+.loginWrapper {
+    width: 80vw;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 2px 2px 15px 0 rgba(0,0,0,0.74);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 50px auto;
+}
+
+.loginWrapper input {
+    width: 80%;
+}
+
+.loginWrapper p {
+    margin: 10px;
+}
+
+.loginWrapper button {
+    margin: 10px;
+    width: 150px;
+}

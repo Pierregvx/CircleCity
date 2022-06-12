@@ -1,0 +1,26 @@
+.historicCard {
+    margin: 40px 0;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 2px 2px 15px 0 rgba(0,0,0,0.74);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headCard {
+    display: flex;
+}
+
+.headCard h4{
+    margin-left: 14px;
+}
+
+.historicCard img {
+    height: 40px;
+}
+
+
+.historicCard p {
+    margin-right: 20px;
+}

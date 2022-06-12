@@ -1,0 +1,15 @@
+.buttonWrapper {
+    padding: 14px 0;
+    width: 180px;
+    border-radius: 8px;
+    border: solid 1px rgba(50, 205, 50, 0.82);
+    background-color: #EFFCEF;
+    color: rgba(50, 205, 50, 0.82);;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    position: relative;
+    text-transform: uppercase;
+}
+

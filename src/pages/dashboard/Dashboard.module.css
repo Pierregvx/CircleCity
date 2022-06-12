@@ -1,0 +1,82 @@
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    margin: 10px auto 20px auto;
+}
+
+.blockies {
+    border-radius: 8px;
+}
+
+.titleWrapper {
+    margin-left: 10%;
+}
+
+.titleWrapper h1 {
+    margin-bottom: 0;
+}
+
+.amountWrapper{
+    text-align: center;
+    margin: 40px auto 90px auto;
+}
+
+.tokenName {
+    color: #8d8d8d;
+    font-size: 1.2rem;
+}
+.actualBalance {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.balanceVariationWrapper {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+.balanceColor {
+    color: limegreen;
+    font-size: 1.1rem;
+}
+.balanceVariation {
+    position: relative;
+    left: 8px;
+    font-size: 1rem;
+}
+
+.separator {
+    height: 1px;
+    border-radius: 2px;
+    width: 50%;
+    margin: 50px auto;
+    background-color: #8d8d8d;
+}
+
+.actionWrapper {
+    display: flex;
+    width: 80%;
+    margin: 40px auto 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.statsWrapper {
+    width: 80%;
+    margin: auto;
+}
+
+.statsWrapper h2{
+    margin-bottom: 4px;
+    text-decoration: underline;
+}
+
+.footer {
+    height: 10vh;
+}

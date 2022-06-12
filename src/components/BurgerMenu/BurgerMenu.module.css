@@ -1,0 +1,24 @@
+.burgerWrapper {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column-reverse;
+}
+
+.burgerWrapper span{
+    height: 3px;
+    background-color: lightgray;
+    border-radius: 1px;
+    margin: 2px 0;
+}
+
+.burgerSmall{
+    width: 12px;
+}
+
+.burgerMedium{
+    width: 20px;
+}
+
+.burgerLarge{
+    width: 30px;
+}

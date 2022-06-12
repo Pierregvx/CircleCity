@@ -19,6 +19,7 @@ const Login = (props) => {
     if(data[0].password === password){
       console.log("Connected");
       props.getAddress(data[0].address)
+      navigate("/dashboard");
 
     }else{
       console.log("Not connected")

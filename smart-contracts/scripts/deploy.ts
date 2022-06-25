@@ -43,7 +43,8 @@ async function main() {
   await circleToken.connect(admin).whitelistUser(baker.address);
   await circleToken.connect(admin).mint(jack.address, 1000000);
   await circleToken.connect(admin).mint(john.address, 1000000);
-  await circleToken.connect(admin).mint(butcher.address, 1000000);
+  const tx = await circleToken.connect(admin).mint(butcher.address, 1000000).then((x:any)=>x.wait());
+  console.log("https://rinkeby.etherscan.io/tx/"+tx.transactionHash )
   await circleToken.connect(admin).setSellerOffer(offer);
   await shopping();
   await circleToken.supplyDiscountsFund(1200);
